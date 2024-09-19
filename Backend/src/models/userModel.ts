@@ -1,14 +1,6 @@
-import mongoose, { Document, Model, Schema } from "mongoose";
+import mongoose, { Document, Model, Schema, Types } from "mongoose";
 import bcrypt from "bcrypt";
-
-// Интерфейс для документа User (включает стандартные методы mongoose и добавленные методы)
-interface IUser extends Document {
-  username: string;
-  email: string;
-  password: string;
-  token?: string;
-  comparePassword(candidatePassword: string): Promise<boolean>;
-}
+import { IUser } from "../types/userTypes";
 
 // Создание схемы для пользователя
 const userSchema: Schema<IUser> = new mongoose.Schema({
@@ -16,6 +8,17 @@ const userSchema: Schema<IUser> = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   token: { type: String },
+  tasks: [
+    { 
+      type: Schema.Types.ObjectId, 
+      ref: 'Task' // Ссылка на модель Task
+    }
+  ],
+  role: {
+    type: String,
+    enum: ['admin', 'user'], // Варианты роли
+    default: 'user' // Роль по умолчанию
+  }
 });
 
 // Прехук для хэширования пароля перед сохранением

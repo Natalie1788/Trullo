@@ -1,13 +1,11 @@
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
+import { IUserWithToken } from '../types/userTypes';
 
 const SECRETKEY = process.env.SECRET_KEY || 'defaultsecret'; // Указываем тип для SECRETKEY
 
 // Интерфейс для пользователя, который будет использоваться для создания токена
-interface IUser {
-  _id: string;
-  email: string;
-}
+
 
 // Интерфейс для расширения объекта Request с полем user
 interface AuthenticatedRequest extends Request {
@@ -15,7 +13,7 @@ interface AuthenticatedRequest extends Request {
 }
 
 // Функция для создания JWT
-export const generateToken = (user: IUser): string => {
+export const generateToken = (user: IUserWithToken): string => {
   return jwt.sign({ id: user._id, email: user.email }, SECRETKEY, {
     expiresIn: '1h', // Токен истекает через 1 час
   });

@@ -1,6 +1,7 @@
 import express from 'express';
 //import cors from 'cors';
-//import { graphqlHTTP } from 'express-graphql';
+import { graphqlHTTP } from 'express-graphql';
+import schema from './schema';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -22,10 +23,10 @@ mongoose.connect("mongodb+srv://cluster0.gyqz4.mongodb.net/Trullo", {
 
 
 
-/*app.use('/graphql', graphqlHTTP({
+app.use('/graphql', graphqlHTTP({
     schema: schema,
     graphiql: true
-}));*/
+}));
 
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
