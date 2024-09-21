@@ -2,6 +2,8 @@ import { UserResolvers} from "../types/userTypes"; // Импортируем и�
 import User from "../models/userModel";
 import { generateToken } from "../auth/auth";
 import { IUserWithToken } from "../types/userTypes";
+import { validationResult } from 'express-validator';
+import { userRegisterValidation } from "../validation/userValidation";
 
 // Определение резолверов с типизацией
 const userResolvers: UserResolvers = {
@@ -23,6 +25,26 @@ const userResolvers: UserResolvers = {
   },
   Mutation: {
     registerUser: async (_, { username, email, password }) => {
+      // Создание фиктивного req для использования валидаторов
+      const mockReq = {
+        body: { username, email, password },
+      };
+
+      // Выполнение валидации
+      for (const validator of userRegisterValidation) {
+        const result = await validator.run(mockReq);
+        if (!result.isEmpty()) break;
+      }
+
+      const errors = validationResult(mockReq);
+      if (!errors.isEmpty()) {
+        throw new Error(
+          errors
+            .array()
+            .map((err) => err.msg)
+            .join(', ')
+        );
+      }
       try {
         const existingUser = await User.findOne({ email }).exec();
         if (existingUser) throw new Error("Email already exists");
@@ -34,8 +56,6 @@ const userResolvers: UserResolvers = {
         });
 
         await newUser.save();
-
-        //const token = generateToken(newUser as IUserWithToken);
 
         return {
           ...newUser.toObject(),
