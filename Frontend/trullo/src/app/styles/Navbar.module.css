@@ -1,0 +1,11 @@
+.navbar {
+    width: 20vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+    border: 1px solid rgb(45, 138, 195);
+    border-radius: 8px;
+    padding: 20px;
+    
+}
