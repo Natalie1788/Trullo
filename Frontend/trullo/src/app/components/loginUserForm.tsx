@@ -1,6 +1,10 @@
+"use client"
+
 import { useState } from "react";
 import { useMutation } from "@apollo/client";
 import { LOGIN_USER } from "../mutations/userMutations";
+import styles from "../styles/LogRegister.module.css"
+import Link from "next/link";
 
 // Интерфейс для данных, которые возвращает мутация логина
 interface LoginUserData {
@@ -48,10 +52,12 @@ const LoginUserForm = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className={styles.form} onSubmit={handleSubmit}>
+      <h1>Sign in</h1>
+
       <label>
         Email:
-        <input
+        <input className={styles.input}
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -60,7 +66,7 @@ const LoginUserForm = () => {
       </label>
       <label>
         Password:
-        <input
+        <input className={styles.input}
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -70,6 +76,8 @@ const LoginUserForm = () => {
       <button type="submit" disabled={loading}>
         {loading ? 'Logging in...' : 'Login'}
       </button>
+
+      <Link href="/register">Do not have an account? Create here</Link>
     </form>
   );
 }

@@ -1,10 +1,30 @@
 .container {
     width: 50vw;
     display: flex;
-    gap: 20px;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+    gap: 50px;
     border: 1px solid rgb(45, 138, 195);
     border-radius: 8px;
     padding: 20px;
+}
+.logocontainer {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+}
+
+.maintext {
+    width: 70%;
+    text-align: center;
+    color: rgb(119, 173, 255);
+}
+
+.start-btn {
+    padding: 10px 50px;
+    border-radius: 5px;
+    background-color: rgb(119, 173, 255);
+    color:black
 }

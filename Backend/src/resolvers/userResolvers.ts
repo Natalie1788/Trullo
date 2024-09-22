@@ -3,7 +3,29 @@ import User from "../models/userModel";
 import { generateToken } from "../auth/auth";
 import { IUserWithToken } from "../types/userTypes";
 import { validationResult } from 'express-validator';
+import { ValidationChain} from 'express-validator';
 import { userRegisterValidation } from "../validation/userValidation";
+
+// Функция для выполнения валидации
+const runValidation = async (inputs: Record<string, any>, validators: ValidationChain[]): Promise<void> => {
+  // Создаём фиктивный объект req с полем body, который ожидает express-validator
+  const req = { body: inputs };
+
+  // Выполняем каждый валидатор на данном req объекте
+  for (let validator of validators) {
+    const result = await validator.run(req);
+    if (!result.isEmpty()) break; // Если найдена ошибка, прерываем цикл
+  }
+
+  // Извлекаем ошибки из валидации
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    // Если есть ошибки, кидаем их в виде исключения
+    const errorMessages = errors.array().map(err => err.msg);
+    throw new Error(errorMessages.join(', '));
+  }
+};
+
 
 // Определение резолверов с типизацией
 const userResolvers: UserResolvers = {
@@ -25,26 +47,9 @@ const userResolvers: UserResolvers = {
   },
   Mutation: {
     registerUser: async (_, { username, email, password }) => {
-      // Создание фиктивного req для использования валидаторов
-      const mockReq = {
-        body: { username, email, password },
-      };
 
-      // Выполнение валидации
-      for (const validator of userRegisterValidation) {
-        const result = await validator.run(mockReq);
-        if (!result.isEmpty()) break;
-      }
+      await runValidation({ username, email, password }, userRegisterValidation);
 
-      const errors = validationResult(mockReq);
-      if (!errors.isEmpty()) {
-        throw new Error(
-          errors
-            .array()
-            .map((err) => err.msg)
-            .join(', ')
-        );
-      }
       try {
         const existingUser = await User.findOne({ email }).exec();
         if (existingUser) throw new Error("Email already exists");

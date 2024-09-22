@@ -1,8 +1,12 @@
-import { REGISTER_USER } from "../mutations/userMutations";
-import { useMutation} from "@apollo/client";
-import { useState } from "react";
+"use client"
 
-// Определение типов для мутации и ее возвращаемого значения
+import { useMutation } from "@apollo/client";
+import { useState } from "react";
+import styles from "../styles/LogRegister.module.css";
+import { REGISTER_USER } from "../mutations/userMutations";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
 interface RegisterUserData {
   registerUser: {
     id: string;
@@ -18,43 +22,69 @@ interface RegisterUserVars {
 }
 
 const RegisterForm = () => {
-  // Определение состояний для хранения значений полей формы
-  const [username, setUsername] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [confirmPassword, setConfirmPassword] = useState<string>('');
+  const [username, setUsername] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [errors, setErrors] = useState<string[]>([]);
 
-  // Использование мутации с типизацией данных и переменных
-  const [registerUser, { loading }] = useMutation<RegisterUserData, RegisterUserVars>(REGISTER_USER, {
-    onCompleted: (data) => {
-      console.log('User registered successfully:', data.registerUser);
-    },
-    onError: (error) => {
-      console.error('Error registering user:', error);
-    }
-  });
+  const router = useRouter();
 
-  // Типизация события формы
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const [registerUser, { loading }] = useMutation<RegisterUserData, RegisterUserVars>(REGISTER_USER);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (password === confirmPassword) {
-      // Передача переменных в мутацию с типизацией
-      registerUser({ variables: { username, email, password } });
-    } else {
-      console.error('Passwords do not match');
+    if (password !== confirmPassword) {
+      setErrors(["Passwords do not match"]);
+      return;
     }
-    // Очистка полей формы после отправки
-    setUsername('');
-    setEmail('');
-    setPassword('');
-    setConfirmPassword('');
-  }
+    try {
+      const response = await registerUser({ variables: { username, email, password } });
+      console.log("User registered successfully:", response.data?.registerUser);
+      // Очистка полей формы после успешной регистрации
+      setUsername("");
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+      router.push("/login");
+      alert("User registered successfully");
+      
+    } catch (error: any) { // Используем `any`, чтобы избежать проблем с типизацией
+      console.error("Error registering user:", error);
+      // Проверка на сетевые ошибки
+      if (error.networkError && typeof error.networkError === "object") {
+        const networkError = error.networkError as any; // Используем any, чтобы избежать проблем с типами
+        if (networkError.result && Array.isArray(networkError.result.errors)) {
+          setErrors(networkError.result.errors.map((err: { message: string }) => err.message));
+        }
+      } else if (error.graphQLErrors) {
+        setErrors(error.graphQLErrors.map((err: any) => err.message));
+      } else {
+        setErrors([error.message]);
+      }
+    }
+  };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className={styles.form} onSubmit={handleSubmit}>
+      {errors.length > 0 && (
+        <div>
+          <ul>
+            {errors.map((error, index) => (
+              <li key={index} style={{ color: "red" }}>
+                {error}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <h1>Register new user</h1>
+
       <label>
         Username:
         <input
+          className={styles.input}
           type="text"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
@@ -64,6 +94,7 @@ const RegisterForm = () => {
       <label>
         Email:
         <input
+          className={styles.input}
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -73,6 +104,7 @@ const RegisterForm = () => {
       <label>
         Password:
         <input
+          className={styles.input}
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -82,6 +114,7 @@ const RegisterForm = () => {
       <label>
         Confirm Password:
         <input
+          className={styles.input}
           type="password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
@@ -89,10 +122,12 @@ const RegisterForm = () => {
         />
       </label>
       <button type="submit" disabled={loading}>
-        {loading ? 'Registering...' : 'Register'}
+        {loading ? "Registering..." : "Register"}
       </button>
+
+      <Link href="/login">Have already an account? Please sign in here</Link>
     </form>
-  )
-}
+  );
+};
 
 export default RegisterForm;

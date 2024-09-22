@@ -1,9 +1,10 @@
+
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import Navbar from "./components/Navbar";
-import { ApolloProvider } from '@apollo/client';
-import client from "./ApolloClient";
+
+
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -29,12 +30,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-      <ApolloProvider client={client}>
+      
+       
         <div style={{display: "flex", justifyContent: "center", gap: "50px", width: "85%", margin: "100px auto", height: "75vh"}}>
         <Navbar />
         {children}
         </div>
-        </ApolloProvider>
+      
+       
       </body>
     </html>
   );
