@@ -2,6 +2,7 @@ import Task from "../models/taskModel";
 import User from "../models/userModel";
 import { TaskResolvers } from "../types/taskTypes";
 import { GraphQLScalarType, Kind } from "graphql";
+import mongoose from "mongoose";
 
 const dateScalar = new GraphQLScalarType({
   name: 'Date',
@@ -43,24 +44,22 @@ const taskResolvers: TaskResolvers = {
         }
     },
     Mutation: {
-        createTask: async (_, {title, description, taskStatus, assignedTo}) => {
+        createTask: async (_, {title, description, taskStatus}) => {
             try{
-            const task = new Task({title, description, taskStatus, assignedTo});
+            const task = new Task({title, description, taskStatus});
             const savedTask = await task.save();
 
-            await User.findByIdAndUpdate(assignedTo, {
-              $push: { tasks: savedTask._id },
-            });
-            return savedTask.populate('assignedTo');
+           
+            return savedTask;
           } catch (error) {
             throw new Error("Error creating recipe")
           }
         },
-        updateTask: async (_, { id, title, description, taskStatus, assignedTo }: { id: string; title?: string; description?: string; taskStatus?: string; assignedTo?: string }) => {
+        updateTask: async (_, { id, title, description, taskStatus }) => {
             try {
               const updatedTask = await Task.findByIdAndUpdate(
                 id,
-                { title, description, taskStatus, assignedTo },
+                { title, description, taskStatus },
                 { new: true }
               ).exec();
       
@@ -69,6 +68,34 @@ const taskResolvers: TaskResolvers = {
               return updatedTask.populate("assignedTo");
             } catch (error) {
               throw new Error("Error updating task");
+            }
+          },
+          assignTaskToUser: async (_, { taskId, assignedTo }) => {
+            try {
+              // Convert the assignedTo (user ID) to an ObjectId
+              const assignedToObjectId = new mongoose.Types.ObjectId(assignedTo);
+          
+              // Update the task with the assigned user
+              const assignedTask = await Task.findByIdAndUpdate(
+                taskId,
+                { assignedTo: assignedToObjectId },
+                { new: true }
+              ).populate("assignedTo") 
+               .exec();
+          
+              if (!assignedTask) throw new Error("Task not found");
+             
+    console.log("Assigned to:", assignedTask.assignedTo);
+          
+    const updatedUser = await User.findByIdAndUpdate(
+      assignedToObjectId,
+      { $push: { tasks: taskId } }, 
+      { new: true } // Возвращаем обновленного пользователя
+    ).exec();
+          
+              return assignedTask
+            } catch (error) {
+              throw new Error("Error assigning task");
             }
           },
           deleteTask: async (_, { id }: { id: string }) => {
@@ -89,6 +116,7 @@ const taskResolvers: TaskResolvers = {
               throw new Error("Error deleting task");
             }
           },
+          
         },
 }
 

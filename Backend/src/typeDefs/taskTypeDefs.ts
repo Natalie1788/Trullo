@@ -20,18 +20,20 @@ type Query {
 type Mutation {
   createTask(
     title: String!
-    description: String
+    description: String!
     taskStatus: String!
-    assignedTo: ID
   ): Task
   updateTask(
     id: ID!
     title: String
     description: String
     taskStatus: String
-    assignedTo: ID
   ): Task
   deleteTask(id: ID!): Task
+  assignTaskToUser(
+    id: ID!
+    assignedTo: ID!
+  ): Task
 }  
 `
 

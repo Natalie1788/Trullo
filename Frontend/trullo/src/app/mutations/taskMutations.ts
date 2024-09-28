@@ -9,12 +9,13 @@ export const CREATE_TASK = gql`
     createTask(
       title: $title,
       description: $description,
-      taskStatus: $taskStatus // Этот параметр можно передавать из клиента, если нужно
+      taskStatus: $taskStatus
     ) {
       id
       title
       description
       taskStatus
+      
     }
   }
 `;
@@ -26,14 +27,14 @@ export const UPDATE_TASK = gql`
     $title: String!,
     $description: String!,
     $taskStatus: String!
-    $assignedTo: String
+  
 ){
     updateTask (
     id: $id,
     title: $title,
     description: $description,
     taskStatus: $taskStatus,
-    assignedTo: $assignedTo
+    
     )    {
         id
         title
@@ -45,6 +46,16 @@ export const UPDATE_TASK = gql`
     }
 }
     `
+    export const UPDATE_TASK_STATUS = gql`
+  mutation updateTaskStatus($id: ID!, $taskStatus: String!) {
+    updateTaskStatus(id: $id, taskStatus: $taskStatus) {
+      id
+      title
+      description
+      taskStatus
+    }
+  }
+`;
 
     export const DELETE_TASK = gql`
     mutation deleteTask($id: ID!) {
@@ -53,3 +64,23 @@ export const UPDATE_TASK = gql`
       }
     }
   `
+
+  export const ASSIGN_TASK = gql`
+  mutation assignTaskToUser(
+    $id: ID!, 
+    $userId: ID!,
+){
+    assignTaskToUser (
+    taskId: $id,
+    userId: $userId
+    )    {
+        id
+        title
+        description
+        taskStatus
+        assignedTo{
+            username
+        }
+    }
+}
+    `

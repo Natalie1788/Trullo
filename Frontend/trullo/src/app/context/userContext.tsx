@@ -7,10 +7,19 @@ interface User {
   id: string;
   username: string;
   email: string;
+  tasks: Task[],
+}
+
+// Определение интерфейса для задачи
+interface Task {
+  id: string;
+  title: string;
+  description: string;
+ 
 }
 
 // Определение интерфейса для контекста пользователя
-interface UserContextType {
+export interface UserContextType {
   user: User | null; // Либо объект User, либо null, если пользователь не авторизован
   setUser: React.Dispatch<React.SetStateAction<User | null>>; // Функция для обновления состояния пользователя
 }

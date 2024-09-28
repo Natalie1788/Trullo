@@ -1,4 +1,4 @@
-"use client"
+/*"use client"
 
 import { GET_USERS } from "../queries/userQueries"
 import { useQuery } from "@apollo/client"
@@ -59,4 +59,4 @@ const UserList = () => {
     return <div>{showUsers()}</div>;
 }
 
-export default UserList;
+export default UserList;*/

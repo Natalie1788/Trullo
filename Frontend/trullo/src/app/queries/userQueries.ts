@@ -26,3 +26,18 @@ export const GET_USER_BY_ID = gql`
         }
     }
 `
+
+export const GET_CURRENT_USER = gql`
+  query GetCurrentUser {
+  currentUser {
+    id
+    username
+    email
+    tasks {
+      id
+      title
+      description
+    }
+  }
+}
+`

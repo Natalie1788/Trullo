@@ -33,6 +33,10 @@ interface IUpdateTaskArgs {
   taskStatus?: 'to-do' | 'in progress' | 'blocked' | 'done';
   assignedTo?: string;
 }
+interface IAssignTaskArgs {
+  taskId: string;
+  assignedTo: string; 
+}
 
 interface IDeleteTaskArgs {
   id: string;
@@ -65,6 +69,12 @@ export type TaskResolvers = {
     updateTask: (
       parent: unknown,
       args: IUpdateTaskArgs,
+      context: IContext,
+      info: GraphQLResolveInfo
+    ) => Promise<ITask | null>;
+    assignTaskToUser: (
+      parent: unknown,
+      args: IAssignTaskArgs,
       context: IContext,
       info: GraphQLResolveInfo
     ) => Promise<ITask | null>;

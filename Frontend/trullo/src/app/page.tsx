@@ -3,6 +3,7 @@
 import Logo from "./components/Logo";
 import styles from "./styles/Home.module.css"
 import { ApolloProvider } from '@apollo/client';
+import { UserProvider } from "./context/userContext";
 import Link from "next/link";
 
 import client from "./ApolloClient";
@@ -10,6 +11,7 @@ import client from "./ApolloClient";
 export default function Home() {
   return (
     <ApolloProvider client={client}>
+      <UserProvider>
       <div className={styles.container}>
     <div className={styles.logocontainer}>
       <Logo/>
@@ -22,6 +24,7 @@ export default function Home() {
   <Link href="/login"><button className={styles["start-btn"]}>Check my plans</button></Link>
   
   </div>
+  </UserProvider>
   </ApolloProvider>
   );
 }

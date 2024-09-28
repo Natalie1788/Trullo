@@ -1,6 +1,6 @@
 import { UserResolvers} from "../types/userTypes"; // Импортируем интерфейсы и типы (нужно создать `types.ts` файл)
 import User from "../models/userModel";
-import { generateToken } from "../auth/auth";
+import { verifyToken, generateToken } from "../auth/auth";
 import { IUserWithToken } from "../types/userTypes";
 import { validationResult } from 'express-validator';
 import { ValidationChain} from 'express-validator';
@@ -44,14 +44,42 @@ const userResolvers: UserResolvers = {
         throw new Error("User not found");
       }
     },
-  },
+currentUser: async (_, __, { req }) => {
+  try {
+    console.log('Request headers:', req.headers); // Логируем заголовки запроса
+    // Используем verifyToken для проверки токена
+    const user = verifyToken(req); // Получаем данные пользователя из токена
+    
+    if (!user.id) {
+      throw new Error("User ID is missing from the token");
+    }
+    // Теперь можно искать пользователя в базе данных
+    const currentUser = await User.findById(user.id).populate("tasks").exec();
+
+    if (!currentUser) {
+      throw new Error("User not found");
+    }
+
+    return {
+      currentUser: {
+        ...currentUser.toObject(),
+        id: currentUser._id,
+      },
+
+    };
+  } catch (error) {
+    throw new Error("Error fetching current user: " + error.message);
+  }
+},
+
+    },
   Mutation: {
     registerUser: async (_, { username, email, password }) => {
 
       await runValidation({ username, email, password }, userRegisterValidation);
 
       try {
-        const existingUser = await User.findOne({ email }).exec();
+        const existingUser = await User.findOne({ email }).populate("tasks").exec();
         if (existingUser) throw new Error("Email already exists");
 
         const newUser = new User({
@@ -72,7 +100,7 @@ const userResolvers: UserResolvers = {
     },
     loginUser: async (_, { email, password }) => {
       try {
-        const user = await User.findOne({ email }).exec();
+        const user = await User.findOne({ email }).populate("tasks").exec();
         if (!user) throw new Error("User with this email does not exist");
 
         const isMatch = await user.comparePassword(password);

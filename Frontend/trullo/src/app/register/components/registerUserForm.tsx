@@ -2,8 +2,8 @@
 
 import { useMutation } from "@apollo/client";
 import { useState } from "react";
-import styles from "../styles/LogRegister.module.css";
-import { REGISTER_USER } from "../mutations/userMutations";
+import styles from "../../styles/LogRegister.module.css"
+import { REGISTER_USER } from "../../mutations/userMutations";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 

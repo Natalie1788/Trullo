@@ -21,6 +21,7 @@ export interface IUser extends Document {
 export interface IContext {
   req: Request;
   token?: string;
+  user?: IUserWithToken;
 }
 
 // Аргументы для мутаций
@@ -60,6 +61,12 @@ export type UserResolvers = {
       context: IContext,
       info: GraphQLResolveInfo
     ) => Promise<IUser | null>;
+    currentUser: (
+      parent: unknown,
+      args: Record<string, unknown>,
+      context: IContext,
+      info: GraphQLResolveInfo
+  ) => Promise<IUser | null>;
   };
   Mutation: {
     registerUser: (
