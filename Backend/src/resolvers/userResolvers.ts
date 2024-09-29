@@ -59,14 +59,15 @@ currentUser: async (_, __, { req }) => {
     if (!currentUser) {
       throw new Error("User not found");
     }
+    console.log("Current User:", currentUser);
 
     return {
-      currentUser: {
+     
         ...currentUser.toObject(),
         id: currentUser._id,
-      },
+      }
 
-    };
+    
   } catch (error) {
     throw new Error("Error fetching current user: " + error.message);
   }

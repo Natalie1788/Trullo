@@ -80,6 +80,7 @@ export const verifyToken = (req: AuthenticatedRequest): TokenPayload => {
 
     // Проверяем, что результат — это объект, а не строка
     if (typeof decoded === 'object' && 'id' in decoded) {
+      console.log('Decoded token:', decoded);
       return decoded as TokenPayload; // Указываем, что это TokenPayload
     } else {
       throw new Error('Invalid token format');
