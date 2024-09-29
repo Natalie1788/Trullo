@@ -31,7 +31,7 @@ type Mutation {
   ): Task
   deleteTask(id: ID!): Task
   assignTaskToUser(
-    id: ID!
+    taskId: ID!
     assignedTo: ID!
   ): Task
 }  

@@ -90,10 +90,10 @@ const taskResolvers: TaskResolvers = {
     const updatedUser = await User.findByIdAndUpdate(
       assignedToObjectId,
       { $push: { tasks: taskId } }, 
-      { new: true } // Возвращаем обновленного пользователя
+      { new: true }
     ).exec();
           
-              return assignedTask
+              return assignedTask;
             } catch (error) {
               throw new Error("Error assigning task");
             }

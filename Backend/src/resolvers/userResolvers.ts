@@ -133,7 +133,7 @@ currentUser: async (_, __, { req }) => {
           id,
           { username, email },
           { new: true }
-        ).exec();
+        ).populate("tasks").exec();
 
         if (!updatedUser) throw new Error("User not found");
 
