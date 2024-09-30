@@ -1,6 +1,10 @@
 .task-item {
    margin-left: 10px;
    margin-block: 10px;
+   border: 1px solid rgb(77, 171, 229);
+   border-radius: 5px;
+   padding: 8px;
+   width: 90%;
 }
 .assign-text {
     font-weight: bold;

@@ -82,7 +82,7 @@ const TasksByStatusToDo = () => {
                     : "Unassigned"}
                 </p>
                 <button onClick={() => setEditingTask(task.id)}>Edit</button>
-                <button onClick={() => handleDeleteTask(task.id)}>Delete</button>
+                <button style={{marginLeft: "10px"}} onClick={() => handleDeleteTask(task.id)}>Delete</button>
               </div>
             )}
           </li>
