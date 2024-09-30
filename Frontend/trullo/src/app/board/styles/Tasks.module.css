@@ -1,0 +1,13 @@
+.task-item {
+   margin-left: 10px;
+   margin-block: 10px;
+}
+.assign-text {
+    font-weight: bold;
+    margin-right: 10px;
+    font-size: smaller;
+    color:rgb(77, 171, 229);
+}
+.tasks-list {
+    list-style: none;
+}

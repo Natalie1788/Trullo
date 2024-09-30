@@ -25,13 +25,15 @@ interface ICreateTaskArgs {
   taskStatus: 'to-do' | 'in progress' | 'blocked' | 'done';
   assignedTo?: string;
 }
+interface ITaskQueryArgs {
+  taskStatus?: 'to-do' | 'in progress' | 'blocked' | 'done'; 
+}
 
 interface IUpdateTaskArgs {
   id: string;
   title?: string;
   description?: string;
   taskStatus?: 'to-do' | 'in progress' | 'blocked' | 'done';
-  assignedTo?: string;
 }
 interface IAssignTaskArgs {
   taskId: string;
@@ -58,6 +60,12 @@ export type TaskResolvers = {
       context: IContext,
       info: GraphQLResolveInfo
     ) => Promise<ITask | null>;
+    tasksByStatus: (
+      parent: unknown,
+      args: ITaskQueryArgs,
+      context: IContext,
+      info: GraphQLResolveInfo
+    ) => Promise<ITask[]>;
   };
   Mutation: {
     createTask: (

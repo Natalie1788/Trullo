@@ -21,7 +21,7 @@ export default function Home() {
 
   <h2 className={styles.maintext}>Here you can collaborate in the best and more convenient way with others and to plan your own task more thoroughly</h2>
   <Link href="/register"><button className={styles["start-btn"]}>Begin planning</button></Link>
-  <Link href="/login"><button className={styles["start-btn"]}>Check my plans</button></Link>
+  
   
   </div>
   </UserProvider>

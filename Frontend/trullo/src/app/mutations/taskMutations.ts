@@ -4,7 +4,7 @@ export const CREATE_TASK = gql`
   mutation createTask(
     $title: String!,
     $description: String!,
-    $taskStatus: String
+    $taskStatus: String!
   ) {
     createTask(
       title: $title,
@@ -26,14 +26,12 @@ export const UPDATE_TASK = gql`
     $id: ID!, 
     $title: String!,
     $description: String!,
-    $taskStatus: String!
   
 ){
     updateTask (
     id: $id,
     title: $title,
     description: $description,
-    taskStatus: $taskStatus,
     
     )    {
         id

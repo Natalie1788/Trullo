@@ -33,6 +33,20 @@ const taskResolvers: TaskResolvers = {
                 throw new Error("Error fetching tasks");
             }
         },
+        tasksByStatus: async (_, { taskStatus }) => {
+          try {
+            // Если статус не передан, вернуть пустой массив
+            if (!taskStatus) {
+              return [];
+            }
+        
+            // Если статус передан, отфильтровать задачи по статусу
+            const tasks = await Task.find({ taskStatus: taskStatus }).populate("assignedTo");
+            return tasks;
+          } catch (error) {
+            throw new Error("Error fetching tasks");
+          }
+        },
         task: async (_, { id }) => {
             try {
                 const task = await Task.findById(id).populate("assignedTo");

@@ -15,6 +15,7 @@ type Task {
 type Query {
     tasks: [Task]!
     task(id: ID!): Task!
+    tasksByStatus(taskStatus: String!): [Task]!
     }
     
 type Mutation {

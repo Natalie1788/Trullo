@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation } from "@apollo/client";
 import { LOGIN_USER } from "../../mutations/userMutations";
 import styles from "../../styles/LogRegister.module.css"
@@ -58,7 +58,7 @@ const LoginUserForm = () => {
       setUser(user);
       console.log("User set in context:", user);
       console.log("Current user from context:", useUser().user);
-      router.push('/account');
+      
 
       // Очищаем поля формы после успешного логина
       setEmail("");
@@ -68,6 +68,13 @@ const LoginUserForm = () => {
       console.error("Login error:", err.message);
     }
   };
+  useEffect(() => {
+    if (user) {
+      // Перенаправляем на страницу профиля пользователя
+      router.push("/mypage");
+    }
+  }, [user, router]);
+
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>

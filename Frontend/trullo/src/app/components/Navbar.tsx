@@ -8,7 +8,7 @@ export default function Navbar() {
             <Link style={{textDecoration: "none", color: "white"}} href="/">Home</Link>
             <Link style={{textDecoration: "none", color: "white"}} href="/board">Board</Link>
             <Link style={{textDecoration: "none", color: "white"}} href="/members">Members</Link>
-            <Link style={{textDecoration: "none", color: "white"}} href="/account">My account</Link>
+            <Link style={{textDecoration: "none", color: "white"}} href="/mypage">My account</Link>
         </nav>
     )
 }

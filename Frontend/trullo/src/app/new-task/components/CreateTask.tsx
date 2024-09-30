@@ -1,8 +1,10 @@
 "use client"
 
 import { useMutation } from "@apollo/client";
-import { useState, FormEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { CREATE_TASK } from "../../mutations/taskMutations"
+import { useUser } from "@/app/context/userContext";
+import { useRouter } from "next/navigation";
 
 // Интерфейсы для мутации и её возвращаемых данных
 interface CreateTaskData {
@@ -16,30 +18,45 @@ interface CreateTaskData {
 interface CreateTaskVars {
   title: string;
   description: string;
+  taskStatus: string;
 }
 
 export default function CreateTask() {
   // Состояния для хранения значений полей формы и ошибок
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
+  const [taskStatus, setTaskStatus] = useState<string>("to-do");
   const [errors, setErrors] = useState<string[]>([]);
+  const { user } = useUser();
+  const router = useRouter();
 
   // Мутация с типизацией данных и переменных
   const [createTask, { loading }] = useMutation<CreateTaskData, CreateTaskVars>(CREATE_TASK);
+
+  const token = (typeof window !== 'undefined') ? localStorage.getItem('token') : null;
+
+  useEffect(() => {
+    
+
+    if (!user) {
+      setErrors(["Please log in."]);
+      router.push("/login"); // Перенаправляем на страницу логина, если нет токена
+    } 
+  }, [router]);
 
   // Функция отправки формы
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Получаем токен из локального хранилища
+    /*// Получаем токен из локального хранилища
     const token = (typeof window !== 'undefined') ? localStorage.getItem('token') : null;
     console.log('Token:', token);
 
     if (!token) {
-      console.error('Error: No token found. Please log in.');
-      setErrors(["No token found. Please log in."]);
+      console.error('Error: Please log in.');
+      setErrors(["Please log in."]);
       return;
-    }
+    }*/
 
     // Проверка заполненности полей
     if (!title || !description) {
@@ -50,13 +67,14 @@ export default function CreateTask() {
     try {
       // Выполнение мутации
       await createTask({
-        variables: { title, description },
+        variables: { title, description, taskStatus },
         context: { headers: { Authorization: `Bearer ${token}` } },
       });
 
       // Очистка полей формы после успешного создания задачи
       setTitle("");
       setDescription("");
+      setTaskStatus("to-do"); 
       setErrors([]);
     } catch (error: any) { // Используем `any` для универсальной обработки ошибок
       console.error('Error creating task:', error);
@@ -89,11 +107,22 @@ export default function CreateTask() {
       <br />
       <label>
         Description:
-        <textarea
+        <textarea style={{width: "250px",height: "100px"}}
+        placeholder="Describe your task..."
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           required
         />
+      </label>
+      <br />
+      <label>
+        Status:
+        <select value={taskStatus} onChange={(e) => setTaskStatus(e.target.value)}>
+          <option value="to-do">To-do</option>
+          <option value="in progress">In Progress</option>
+          <option value="blocked">Blocked</option>
+          <option value="done">Done</option>
+        </select>
       </label>
       <br />
       {errors.length > 0 && (
