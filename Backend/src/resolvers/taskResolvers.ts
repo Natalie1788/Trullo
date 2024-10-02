@@ -69,19 +69,35 @@ const taskResolvers: TaskResolvers = {
             throw new Error("Error creating recipe")
           }
         },
-        updateTask: async (_, { id, title, description, taskStatus }) => {
+        updateTask: async (_, { id, title, description }) => {
             try {
               const updatedTask = await Task.findByIdAndUpdate(
                 id,
-                { title, description, taskStatus },
+                { title, description },
                 { new: true }
-              ).exec();
+              );
       
               if (!updatedTask) throw new Error("Task not found");
       
               return updatedTask.populate("assignedTo");
             } catch (error) {
               throw new Error("Error updating task");
+            }
+          },
+          updateTaskStatus: async (_, { id, taskStatus }) => {
+            try {
+              // Обновление только статуса задачи
+              const updatedTask = await Task.findByIdAndUpdate(
+                id,
+                { taskStatus }, // Обновляется только taskStatus
+                { new: true } // Вернуть обновлённый объект
+              );
+              
+              if (!updatedTask) throw new Error("Task not found");
+              
+              return updatedTask.populate("assignedTo"); // Пополнение assignedTo для возврата пользователя
+            } catch (error) {
+              throw new Error("Error updating task status");
             }
           },
           assignTaskToUser: async (_, { taskId, assignedTo }) => {
@@ -94,8 +110,7 @@ const taskResolvers: TaskResolvers = {
                 taskId,
                 { assignedTo: assignedToObjectId },
                 { new: true }
-              ).populate("assignedTo") 
-               .exec();
+              ).populate("assignedTo") ;
           
               if (!assignedTask) throw new Error("Task not found");
              
@@ -105,7 +120,7 @@ const taskResolvers: TaskResolvers = {
       assignedToObjectId,
       { $push: { tasks: taskId } }, 
       { new: true }
-    ).exec();
+    );
           
               return assignedTask;
             } catch (error) {
@@ -114,7 +129,7 @@ const taskResolvers: TaskResolvers = {
           },
           deleteTask: async (_, { id }: { id: string }) => {
             try {
-              const deletedTask = await Task.findByIdAndDelete(id).exec();
+              const deletedTask = await Task.findByIdAndDelete(id);
       
               if (!deletedTask) throw new Error("Task not found");
       
@@ -122,7 +137,7 @@ const taskResolvers: TaskResolvers = {
               if (deletedTask.assignedTo) {
                 await User.findByIdAndUpdate(deletedTask.assignedTo, {
                   $pull: { tasks: deletedTask._id },
-                }).exec();
+                });
               }
       
               return deletedTask;

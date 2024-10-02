@@ -32,14 +32,14 @@ const userResolvers: UserResolvers = {
   Query: {
     users: async () => {
       try {
-        return await User.find({}).populate("tasks").exec();
+        return await User.find({}).populate("tasks");
       } catch (error) {
         throw new Error("Error fetching users");
       }
     },
     user: async (_, { id }) => {
       try {
-        return await User.findById(id).populate("tasks").exec();
+        return await User.findById(id).populate("tasks");
       } catch (error) {
         throw new Error("User not found");
       }
@@ -54,7 +54,7 @@ currentUser: async (_, __, { req }) => {
       throw new Error("User ID is missing from the token");
     }
     // Теперь можно искать пользователя в базе данных
-    const currentUser = await User.findById(user.id).populate("tasks").exec();
+    const currentUser = await User.findById(user.id).populate("tasks");
 
     if (!currentUser) {
       throw new Error("User not found");
@@ -80,7 +80,7 @@ currentUser: async (_, __, { req }) => {
       await runValidation({ username, email, password }, userRegisterValidation);
 
       try {
-        const existingUser = await User.findOne({ email }).populate("tasks").exec();
+        const existingUser = await User.findOne({ email }).populate("tasks");
         if (existingUser) throw new Error("Email already exists");
 
         const newUser = new User({
@@ -101,7 +101,7 @@ currentUser: async (_, __, { req }) => {
     },
     loginUser: async (_, { email, password }) => {
       try {
-        const user = await User.findOne({ email }).populate("tasks").exec();
+        const user = await User.findOne({ email }).populate("tasks");
         if (!user) throw new Error("User with this email does not exist");
 
         const isMatch = await user.comparePassword(password);
@@ -134,7 +134,7 @@ currentUser: async (_, __, { req }) => {
           id,
           { username, email },
           { new: true }
-        ).populate("tasks").exec();
+        ).populate("tasks");
 
         if (!updatedUser) throw new Error("User not found");
 
@@ -145,7 +145,7 @@ currentUser: async (_, __, { req }) => {
     },
     deleteUser: async (_, { id}) => {
       try {
-        const deletedUser = await User.findByIdAndDelete(id).exec();
+        const deletedUser = await User.findByIdAndDelete(id);
 
         if (!deletedUser) {
           throw new Error("User not found");

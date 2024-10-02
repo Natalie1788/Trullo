@@ -28,8 +28,11 @@ type Mutation {
     id: ID!
     title: String
     description: String
-    taskStatus: String
   ): Task
+  updateTaskStatus(
+   id: ID!
+    taskStatus: String!
+    ) : Task
   deleteTask(id: ID!): Task
   assignTaskToUser(
     taskId: ID!

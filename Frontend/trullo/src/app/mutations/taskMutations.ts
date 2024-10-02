@@ -48,8 +48,6 @@ export const UPDATE_TASK = gql`
   mutation updateTaskStatus($id: ID!, $taskStatus: String!) {
     updateTaskStatus(id: $id, taskStatus: $taskStatus) {
       id
-      title
-      description
       taskStatus
     }
   }

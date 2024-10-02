@@ -33,8 +33,14 @@ interface IUpdateTaskArgs {
   id: string;
   title?: string;
   description?: string;
+  
+}
+
+interface IUpdateTaskStatusArgs{
+  id: string;
   taskStatus?: 'to-do' | 'in progress' | 'blocked' | 'done';
 }
+
 interface IAssignTaskArgs {
   taskId: string;
   assignedTo: string; 
@@ -77,6 +83,12 @@ export type TaskResolvers = {
     updateTask: (
       parent: unknown,
       args: IUpdateTaskArgs,
+      context: IContext,
+      info: GraphQLResolveInfo
+    ) => Promise<ITask | null>;
+    updateTaskStatus: (
+      parent: unknown,
+      args: IUpdateTaskStatusArgs,
       context: IContext,
       info: GraphQLResolveInfo
     ) => Promise<ITask | null>;
