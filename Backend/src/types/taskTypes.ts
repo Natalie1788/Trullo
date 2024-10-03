@@ -45,6 +45,9 @@ interface IAssignTaskArgs {
   taskId: string;
   assignedTo: string; 
 }
+interface IUnassignTaskArgs {
+  id: string;
+}
 
 interface IDeleteTaskArgs {
   id: string;
@@ -98,6 +101,12 @@ export type TaskResolvers = {
       context: IContext,
       info: GraphQLResolveInfo
     ) => Promise<ITask | null>;
+    unassignTask: (
+      parent: unknown,
+      args: IUnassignTaskArgs,
+      context: IContext,
+      info: GraphQLResolveInfo
+    )=> Promise<ITask | null>;
     deleteTask: (
       parent: unknown,
       args: IDeleteTaskArgs,

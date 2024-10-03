@@ -62,13 +62,13 @@ export const UPDATE_TASK = gql`
   `
 
   export const ASSIGN_TASK = gql`
-  mutation assignTaskToUser(
-    $id: ID!, 
-    $userId: ID!,
+ mutation assignTaskToUser(
+    $taskId: ID!, 
+    $assignedTo: ID!,
 ){
     assignTaskToUser (
-    taskId: $id,
-    userId: $userId
+    taskId: $taskId,
+    assignedTo: $assignedTo
     )    {
         id
         title
@@ -79,4 +79,17 @@ export const UPDATE_TASK = gql`
         }
     }
 }
+    `
+
+    export const UNASSIGN_TASK = gql`
+    mutation unassignTask($id: ID!) {
+  unassignTask(id: $id) {
+    id
+    title
+    assignedTo {
+      username
+    }
+  }
+}
+
     `

@@ -127,6 +127,26 @@ const taskResolvers: TaskResolvers = {
               throw new Error("Error assigning task");
             }
           },
+    unassignTask: async (_, { id }) => {
+            try {
+              // Найти задачу и установить поле assignedTo в null (удалить назначенного пользователя)
+              const updatedTask = await Task.findByIdAndUpdate(
+                id,
+                { assignedTo: null },
+                { new: true }
+              );
+          
+              if (!updatedTask) {
+                throw new Error("Task not found");
+              }
+          
+              return updatedTask.populate("assignedTo");
+            } catch (error) {
+              throw new Error("Error unassigning task");
+            }
+    },
+  
+          
           deleteTask: async (_, { id }: { id: string }) => {
             try {
               const deletedTask = await Task.findByIdAndDelete(id);

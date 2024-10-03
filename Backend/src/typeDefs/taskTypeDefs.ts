@@ -38,6 +38,9 @@ type Mutation {
     taskId: ID!
     assignedTo: ID!
   ): Task
+  unassignTask(
+    id: ID!
+  ) : Task
 }  
 `
 
