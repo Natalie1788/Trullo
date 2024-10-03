@@ -100,14 +100,14 @@ const taskResolvers: TaskResolvers = {
               throw new Error("Error updating task status");
             }
           },
-          assignTaskToUser: async (_, { taskId, assignedTo }) => {
+          assignTaskToUser: async (_, { id, assignedTo }) => {
             try {
               // Convert the assignedTo (user ID) to an ObjectId
               const assignedToObjectId = new mongoose.Types.ObjectId(assignedTo);
           
               // Update the task with the assigned user
               const assignedTask = await Task.findByIdAndUpdate(
-                taskId,
+                id,
                 { assignedTo: assignedToObjectId },
                 { new: true }
               ).populate("assignedTo") ;
@@ -118,7 +118,7 @@ const taskResolvers: TaskResolvers = {
           
     const updatedUser = await User.findByIdAndUpdate(
       assignedToObjectId,
-      { $push: { tasks: taskId } }, 
+      { $push: { tasks: id } }, 
       { new: true }
     );
           

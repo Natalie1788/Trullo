@@ -4,7 +4,7 @@ import { useQuery, useMutation } from "@apollo/client";
 import { useEffect, useState } from "react";
 import { GET_USERS } from "@/app/queries/userQueries";
 import { GET_TASKS_BY_STATUS } from "@/app/queries/taskQueries";
-import { UPDATE_TASK, DELETE_TASK, ASSIGN_TASK } from "@/app/mutations/taskMutations";
+import { UPDATE_TASK, DELETE_TASK, ASSIGN_TASK, UNASSIGN_TASK } from "@/app/mutations/taskMutations";
 import styles from "../styles/Tasks.module.css";
 
 // Интерфейсы для данных о задачах
@@ -42,6 +42,7 @@ const TasksByStatusInProgress = () => {
   const [updateTask] = useMutation(UPDATE_TASK);
   const [deleteTask] = useMutation(DELETE_TASK);
   const [assignTask] = useMutation(ASSIGN_TASK);
+  const [unassignTask] = useMutation(UNASSIGN_TASK);
 
   const [editingTask, setEditingTask] = useState<string | null>(null);
   const [taskTitle, setTaskTitle] = useState<string>("");
@@ -90,11 +91,22 @@ const TasksByStatusInProgress = () => {
             ) : (
               <div>
                 <p>{task.title}</p>
-                <p className={styles["assign-text"]}>
-                  {task.assignedTo && task.assignedTo.username
-                    ? task.assignedTo.username
-                    : "Unassigned"}
-                </p>
+                {task.assignedTo && task.assignedTo.username ? (
+                <div style={{marginBottom: "10px"}}>
+                <span className={styles["assign-text"]}>
+                      {task.assignedTo.username}
+                </span>
+                 <button
+                      style={{ marginLeft: "10px", color: "black" }}
+                      onClick={() => handleUnassignTask(task.id)}
+                        >
+                        Unassign
+                        </button>
+                       </div>
+                    ) : (
+                        <p className={styles["assign-text"]}>Unassigned</p>
+                      )}
+
                 <button onClick={() => setEditingTask(task.id)}>Edit</button>
                 <button style={{ marginLeft: "10px" }} onClick={() => handleDeleteTask(task.id)}>
                   Delete
@@ -170,6 +182,16 @@ const TasksByStatusInProgress = () => {
       console.error("Error assigning task:", error);
     }
   };
+
+  const handleUnassignTask = async (id: string) => {
+    try {
+      await unassignTask({ variables: { id } });
+      refetch(); // Перезапрос данных после отмены назначения
+    } catch (error) {
+      console.error("Error unassigning task:", error);
+    }
+  }
+
   return <div>{showTasksByStatus()}</div>;
 };
 

@@ -63,11 +63,11 @@ export const UPDATE_TASK = gql`
 
   export const ASSIGN_TASK = gql`
  mutation assignTaskToUser(
-    $taskId: ID!, 
+    $id: ID!, 
     $assignedTo: ID!,
 ){
     assignTaskToUser (
-    taskId: $taskId,
+    id: $id,
     assignedTo: $assignedTo
     )    {
         id

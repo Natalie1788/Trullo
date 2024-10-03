@@ -42,7 +42,7 @@ interface IUpdateTaskStatusArgs{
 }
 
 interface IAssignTaskArgs {
-  taskId: string;
+  id: string;
   assignedTo: string; 
 }
 interface IUnassignTaskArgs {
