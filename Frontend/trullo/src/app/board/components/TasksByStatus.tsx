@@ -1,13 +1,13 @@
-"use client";
+"use client"
 
 import { useQuery, useMutation } from "@apollo/client";
 import { useEffect, useState } from "react";
 import { GET_USERS } from "@/app/queries/userQueries";
 import { GET_TASKS_BY_STATUS } from "@/app/queries/taskQueries";
-import { UPDATE_TASK, DELETE_TASK, ASSIGN_TASK, UNASSIGN_TASK } from "@/app/mutations/taskMutations";
+import { UPDATE_TASK, DELETE_TASK, ASSIGN_TASK, UNASSIGN_TASK, UPDATE_TASK_STATUS } from "@/app/mutations/taskMutations";
 import styles from "../styles/Tasks.module.css";
 
-// Интерфейсы для данных о задачах
+// Интерфейсы
 interface TaskByStatus {
   id: string;
   title: string;
@@ -31,35 +31,37 @@ interface GetUsersData {
   users: User[];
 }
 
-const TasksByStatusInProgress = () => {
+interface TasksByStatusProps {
+  status: string;
+}
+
+const TasksByStatus: React.FC<TasksByStatusProps> = ({ status }) => {
   const { loading, error, data, refetch } = useQuery<GetTasksByStatusData>(GET_TASKS_BY_STATUS, {
-    variables: { taskStatus: "in progress" },
+    variables: { taskStatus: status },
   });
 
   const { loading: usersLoading, error: usersError, data: usersData } = useQuery<GetUsersData>(GET_USERS);
 
-  // Мутации для редактирования, удаления и назначения задач
   const [updateTask] = useMutation(UPDATE_TASK);
   const [deleteTask] = useMutation(DELETE_TASK);
   const [assignTask] = useMutation(ASSIGN_TASK);
   const [unassignTask] = useMutation(UNASSIGN_TASK);
+  const [updateTaskStatus] = useMutation(UPDATE_TASK_STATUS);
 
   const [editingTask, setEditingTask] = useState<string | null>(null);
   const [taskTitle, setTaskTitle] = useState<string>("");
   const [assigningTask, setAssigningTask] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [taskDescription, setTaskDescription] = useState<string>("");
+  const [editingStatusTaskId, setEditingStatusTaskId] = useState<string | null>(null); // Для изменения статуса
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+
+  const availableStatuses = ["to-do", "in progress", "blocked", "done"];
 
   useEffect(() => {
-    if (loading) {
-      console.log("loading tasks");
-    }
-    if (error) {
-      console.error("Error fetching tasks", error);
-    }
-    if (data) {
-      console.log("Fetched tasks", data.tasksByStatus);
-    }
+    if (loading) console.log("loading tasks");
+    if (error) console.error("Error fetching tasks", error);
+    if (data) console.log("Fetched tasks", data.tasksByStatus);
   }, [data, loading, error]);
 
   const showTasksByStatus = () => {
@@ -107,6 +109,28 @@ const TasksByStatusInProgress = () => {
                         <p className={styles["assign-text"]}>Unassigned</p>
                       )}
 
+              <button style={{marginRight: "10px"}} onClick={() => setEditingStatusTaskId(task.id)}>
+                Change status
+              </button>
+
+              {editingStatusTaskId === task.id && (
+                <div>
+                  <select
+                    onChange={(e) => setSelectedStatus(e.target.value)}
+                    value={selectedStatus || ""}
+                  >
+                    <option value="" disabled>Select new status</option>
+                    {availableStatuses.map((statusOption) => (
+                      <option key={statusOption} value={statusOption}>
+                        {statusOption}
+                      </option>
+                    ))}
+                  </select>
+                  <button onClick={() => handleChangeStatus(task.id)}>Save</button>
+                  <button onClick={() => setEditingStatusTaskId(null)}>Cancel</button>
+                </div>
+              )}
+
                 <button onClick={() => setEditingTask(task.id)}>Edit</button>
                 <button style={{ marginLeft: "10px" }} onClick={() => handleDeleteTask(task.id)}>
                   Delete
@@ -143,14 +167,11 @@ const TasksByStatusInProgress = () => {
     );
   };
 
-
   const handleUpdateTask = async (id: string) => {
     try {
-      await updateTask({
-        variables: { id, title: taskTitle, description: taskDescription },
-      });
+      await updateTask({ variables: { id, title: taskTitle, description: taskDescription } });
       setEditingTask(null);
-      refetch(); // Перезапрос данных после обновления
+      refetch();
     } catch (error) {
       console.error("Error updating task:", error);
     }
@@ -159,7 +180,7 @@ const TasksByStatusInProgress = () => {
   const handleDeleteTask = async (id: string) => {
     try {
       await deleteTask({ variables: { id } });
-      refetch(); // Перезапрос данных после удаления
+      refetch();
     } catch (error) {
       console.error("Error deleting task:", error);
     }
@@ -172,12 +193,10 @@ const TasksByStatusInProgress = () => {
     }
 
     try {
-      await assignTask({
-        variables: { id, assignedTo: selectedUser },
-      });
-      refetch(); // Перезапрос данных после назначения
-      setAssigningTask(null); // Сброс состояния после назначения
-      setSelectedUser(null); // Очистка выбранного пользователя
+      await assignTask({ variables: { id, assignedTo: selectedUser } });
+      refetch();
+      setAssigningTask(null);
+      setSelectedUser(null);
     } catch (error) {
       console.error("Error assigning task:", error);
     }
@@ -186,13 +205,30 @@ const TasksByStatusInProgress = () => {
   const handleUnassignTask = async (id: string) => {
     try {
       await unassignTask({ variables: { id } });
-      refetch(); // Перезапрос данных после отмены назначения
+      refetch();
     } catch (error) {
       console.error("Error unassigning task:", error);
     }
-  }
+  };
+
+  const handleChangeStatus = async (taskId: string) => {
+    if (!selectedStatus) {
+      alert("Please select a status.");
+      return;
+    }
+
+    try {
+      await updateTaskStatus({
+        variables: { id: taskId, taskStatus: selectedStatus },
+      });
+      refetch(); // Перезапрос данных после изменения статуса
+      setEditingStatusTaskId(null); // Закрыть меню выбора статуса
+    } catch (error) {
+      console.error("Error updating task status:", error);
+    }
+  };
 
   return <div>{showTasksByStatus()}</div>;
 };
 
-export default TasksByStatusInProgress;
+export default TasksByStatus;

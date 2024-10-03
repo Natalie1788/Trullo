@@ -1,7 +1,7 @@
 import styles from "./styles/Board.module.css"
 import Link from "next/link"
-import TasksByStatusInProgress from "./components/InprogressTasks"
-import TasksByStatusToDo from "./components/ToDoTasks"
+import { TasksByStatusToDo, TasksByStatusInProgress, TasksByStatusBlocked} from "./components/Tasks"
+import TasksByStatusDone from "./components/TasksDone"
 
 export default function Board() {
 
@@ -22,10 +22,12 @@ export default function Board() {
 
             <div className={styles.boardpart}>
                 <p className={styles.headtext}>Blocked</p>
+                <TasksByStatusBlocked/>
             </div>
 
             <div className={styles.boardpart}>
                 <p className={styles.headtext}>Done</p>
+                <TasksByStatusDone/>
             </div>
         </div>
     )
